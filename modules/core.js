@@ -2545,36 +2545,24 @@
 	// Absolute file name
 	Session.prototype.absolute_file_name = function(filename) {
 		var absolute;
-		// node.js
-		if(this.get_flag("nodejs").indicator === "true/0") {
-			var path = require("path");
+		var cwd = this.working_directory;
+		if(filename[0] === "/")
 			absolute = filename;
-			for(var prop in process.env) {
-				if(!process.env.hasOwnProperty(prop))
-					continue;
-				absolute = absolute.replace(new RegExp("\\$" + prop, "g"), process.env[prop]);
+		else
+			absolute = cwd + (cwd[cwd.length-1] === "/" ? filename : "/" + filename);
+		absolute = absolute.replace(/\/\.\//g, "/");
+		var dirs = absolute.split("/");
+		var dirs2 = [];
+		for(var i = 0; i < dirs.length; i++) {
+			if(dirs[i] !== "..") {
+				dirs2.push(dirs[i]);
+			} else {
+				if(dirs2.length !== 0)
+					dirs2.pop();
 			}
-			return path.resolve(absolute);
-		// browser
-		} else {
-			var cwd = this.working_directory;
-			if(filename[0] === "/")
-				absolute = filename;
-			else
-				absolute = cwd + (cwd[cwd.length-1] === "/" ? filename : "/" + filename);
-			absolute = absolute.replace(/\/\.\//g, "/");
-			var dirs = absolute.split("/");
-			var dirs2 = [];
-			for(var i = 0; i < dirs.length; i++) {
-				if(dirs[i] !== "..") {
-					dirs2.push(dirs[i]);
-				} else {
-					if(dirs2.length !== 0)
-						dirs2.pop();
-				}
-			}
-			absolute = dirs2.join("/").replace(/\/\.$/, "/");
 		}
+		absolute = dirs2.join("/").replace(/\/\.$/, "/");
+		
 		return absolute;
 	};
 	Thread.prototype.absolute_file_name = function(path, cwd) {
@@ -2770,20 +2758,6 @@
 					string = script.text;
 					success = true;
 				}
-			}
-			// file (node.js)
-			if(!success && opts.file && this.get_flag("nodejs").indicator === "true/0") {
-				var fs = require("fs");
-				var thread = this;
-				fs.readFile(program, function(error, data) {
-					if(error) {
-						opts.file = false;
-						thread.consult(program, opts);
-					} else {
-						parseProgram(thread, data.toString(), opts);
-					}
-				});
-				return;
 			}
 			// http request
 			if(!success && this.get_flag("nodejs").indicator === "false/0" && opts.url && program !== "" && !(/\s/.test(program))) {

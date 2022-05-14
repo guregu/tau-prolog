@@ -1,4 +1,3 @@
-var readlineSync = require("readline-sync");
 var pl = require("./modules/core.js");
 require("./modules/charsio.js")(pl);
 require("./modules/format.js")(pl);
@@ -23,7 +22,7 @@ const show = function(answer) {
     console.log(pl.format_answer(answer, session, {quoted: true}));
 };
 const action = function(callback) {
-    var input = readlineSync.question("", {keepWhitespace: true}).trim();
+    var input = prompt("Next?", ";", {keepWhitespace: true}).trim();
     switch(input) {
         // next answer
         case ";":
@@ -67,7 +66,7 @@ const query = function(goal, callback) {
     }, error: compose(repl, show)});
 };
 const repl = function() {
-    var goal = readlineSync.question("?- ", {keepWhitespace: true}) + "\n";
+    var goal = prompt("Query", "?- ") + "\n";
     query(goal, repl);
 };
 
