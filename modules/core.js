@@ -211,113 +211,6 @@
 			return true;
 		} 
 	};
-
-	// Virtual file system for Node.js
-	nodejs_file_system = {
-		// Open file
-		open: function( path, type, mode ) {
-			var fd, fs = require('fs');
-			if( mode === "read" && !fs.existsSync( path ) )
-				return null;
-			try {
-				fd = fs.openSync( path, mode[0] );
-			} catch(ex) {
-				return false;
-			}
-			return {
-				get: function( length, position ) {
-					var buffer = new Buffer( length );
-					fs.readSync( fd, buffer, 0, length, position );
-					var end_of_file = true;
-					var text = buffer.toString();
-					for(var i = 0; i < length && end_of_file; i++)
-						end_of_file = text[i] === "\u0000";
-					return end_of_file ? "end_of_stream" : buffer.toString();
-				},
-				eof: function(position) {
-					var stats = fs.statSync(path)
-					return position === stats["size"];
-				},
-				put: function( text, position ) {
-					var buffer = Buffer.from( text );
-					if( position === "end_of_stream" )
-						fs.writeSync( fd, buffer );
-					else if( position === "past_end_of_stream" )
-						return null;
-					else
-						fs.writeSync( fd, buffer, 0, buffer.length, position );
-					return true;
-				},
-				get_byte: function( position ) {
-					try {
-						var buffer = Buffer.alloc(1);
-						var bytesRead = fs.readSync(fd, buffer, 0, 1, position);
-						//var _text = buffer.toString("utf8", 0, bytesRead);
-						var end_of_file = bytesRead < 1;
-						return end_of_file ? "end_of_stream" : buffer.readUInt8(0);
-					} catch(ex) {
-						return "end_of_stream";
-					}
-				},
-				put_byte: function(byte, position) {
-					var buffer = Buffer.from([byte]);
-					if(position === "end_of_stream")
-						fs.writeSync(fd, buffer);
-					else if(position === "past_end_of_stream")
-						return null;
-					else
-						fs.writeSync(fd, buffer, 0, buffer.length, position);
-					return true;
-				},
-				flush: function() {
-					return true;
-				},
-				close: function() {
-					fs.closeSync( fd );
-					return true;
-				}
-			};
-		}
-	};
-
-	// User input for Node.js
-	nodejs_user_input = {
-		buffer: "",
-		get: function( length, _ ) {
-			var text;
-			var readlineSync = require('readline-sync');
-			while( nodejs_user_input.buffer.length < length )
-				nodejs_user_input.buffer += readlineSync.question("", {keepWhitespace: true}) + "\n";
-			text = nodejs_user_input.buffer.substr( 0, length );
-			nodejs_user_input.buffer = nodejs_user_input.buffer.substr( length );
-			return text;
-		},
-		eof: function(length) {
-			return false;
-		}
-	};
-
-	// User output for Node.js
-	nodejs_user_output = {
-		put: function( text, _ ) {
-			process.stdout.write( text );
-			return true;
-		},
-		flush: function() {
-			return true;
-		}
-	};
-
-	// User error for Node.js
-	nodejs_user_error = {
-		put: function( text, _ ) {
-			process.stderr.write( text );
-			return true;
-		},
-		flush: function() {
-			return true;
-		} 
-	};
 	
 	
 	
@@ -1685,16 +1578,16 @@
 		this.limit = limit;
 		this.streams = {
 			"user_input": new Stream(
-				nodejs_flag ? nodejs_user_input : tau_user_input,
+				nodejs_flag ? null : tau_user_input,
 				"read", "user_input", "text", false, "reset" ),
 			"user_output": new Stream(
-				nodejs_flag ? nodejs_user_output : tau_user_output,
+				nodejs_flag ? null : tau_user_output,
 				"append", "user_output", "text", false, "reset" ),
 			"user_error": new Stream(
-				nodejs_flag ? nodejs_user_error : tau_user_error,
+				nodejs_flag ? null : tau_user_error,
 				"append", "user_error", "text", false, "reset" ),
 		};
-		this.file_system = nodejs_flag ? nodejs_file_system : tau_file_system;
+		this.file_system = tau_file_system;
 		this.standard_input = this.streams["user_input"];
 		this.standard_output = this.streams["user_output"];
 		this.standard_error = this.streams["user_error"];
