@@ -1,5 +1,3 @@
-(function() {
-	
 	// VERSION
 	var version = { major: 0, minor: 3, patch: 2, status: "beta" };
 
@@ -129,7 +127,7 @@
 	};
 
 	// Virtual file system for browser
-	tau_file_system = {
+	var tau_file_system = {
 		// Current files
 		files: new TauDirectory("/", "/", null),
 		// Open file
@@ -169,7 +167,7 @@
 	};
 
 	// User input for browser
-	tau_user_input = {
+	var tau_user_input = {
 		buffer: "",
 		get: function( length, _ ) {
 			var text;
@@ -191,7 +189,7 @@
 	};
 
 	// User output for browser
-	tau_user_output = {
+	var tau_user_output = {
 		put: function( text, _ ) {
 			console.log( text );
 			return true;
@@ -202,7 +200,7 @@
 	};
 
 	// User error for browser
-	tau_user_error = {
+	var tau_user_error = {
 		put: function( text, _ ) {
 			(console.error || console.log)( text );
 			return true;
@@ -2643,15 +2641,6 @@
 		// string
 		if(typeof program === "string") {
 			string = program;
-			// script id
-			if(opts.script && this.get_flag("nodejs").indicator === "false/0" && program != "" && document.getElementById(string)) {
-				var script = document.getElementById(string);
-				var type = script.getAttribute("type");
-				if(type !== null && type.replace(/ /g, "").toLowerCase() === "text/prolog") {
-					string = script.text;
-					success = true;
-				}
-			}
 			// http request
 			if(!success && this.get_flag("nodejs").indicator === "false/0" && opts.url && program !== "" && !(/\s/.test(program))) {
 				try {
@@ -3471,7 +3460,7 @@
 	var pl = {
 		
 		// Environment
-		__env: nodejs_flag ? global : window,
+		__env: globalThis,
 		
 		// Modules
 		modules: {},
@@ -8931,10 +8920,4 @@
 		}
 	});
 
-	if( typeof module !== 'undefined' ) {
-		module.exports = pl;
-	} else {
-		window.pl = pl;
-	}
-	
-})();
+	export default pl;
