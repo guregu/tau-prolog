@@ -3260,7 +3260,7 @@
 
 	// Check if a variables has attributes
 	Substitution.prototype.has_attributes = function( variable ) {
-		return this.attrs[variable] && this.attrs[variable] !== {};
+		return this.attrs[variable] && Object.keys(this.attrs[variable]).length > 0;
 	}
 	
 	
@@ -8919,5 +8919,15 @@
 			"setof/3": new Term("setof", [new Term("?"), new Term("^"), new Term("-")])
 		}
 	});
+
+	pl.types = {
+		Term: Term,
+		Var: Var,
+		Num: Num,
+		Rule: Rule,
+		Substitution: Substitution,
+		Session: Session,
+		Thread: Thread
+	};
 
 	export default pl;
