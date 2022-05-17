@@ -8920,14 +8920,4 @@
 		}
 	});
 
-	pl.types = {
-		Term: Term,
-		Var: Var,
-		Num: Num,
-		Rule: Rule,
-		Substitution: Substitution,
-		Session: Session,
-		Thread: Thread
-	};
-
 	export default pl;
