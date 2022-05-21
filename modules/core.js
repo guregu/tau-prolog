@@ -4249,7 +4249,7 @@
 					indicators = arrayToList([indicators]);
 				var pointer = indicators;
 				while(pl.type.is_term(pointer) && pointer.indicator === "./2") {
-					indicator = pointer.args[0];
+					var indicator = pointer.args[0];
 					if( pl.type.is_variable( indicator ) ) {
 						thread.throw_warning( pl.error.instantiation( atom.indicator ) );
 					} else if( !pl.type.is_compound( indicator ) || indicator.indicator !== "//2" ) {
@@ -6362,7 +6362,7 @@
 							return;
 						}
 					}
-					group = new Term("[]", []);
+					var group = new Term("[]", []);
 					for(var i = keys.length-1; i >= 0; i--)
 						group = new Term(".", [new Term("-", [keys[i], arrayToList(values[i])]), group]);
 					thread.prepend([
