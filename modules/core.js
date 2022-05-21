@@ -2670,19 +2670,6 @@
 			if(!success && opts.text) {
 				success = true;
 			}
-		// html
-		} else if(opts.html && program.nodeName) {
-			switch(program.nodeName.toLowerCase()) {
-				case "input":
-				case "textarea":
-					string = program.value;
-					success = true;
-					break;
-				default:
-					string = program.innerHTML;
-					success = true;
-					break;
-			}
 		} else {
 			opts.error(pl.error.existence("source_sink", new Term(string), "top_level/0"));
 		}
