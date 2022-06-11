@@ -186,7 +186,7 @@ declare module 'tau-prolog' {
 
         public readonly rules: Record<string, Rule>;
 
-        public readonly modules: string[];
+        public readonly modules: Record<string, Module>;
 
         public readonly threads: Thread[];
 
