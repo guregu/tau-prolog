@@ -1,5 +1,5 @@
 	// VERSION
-	var version = { major: 0, minor: 3, patch: 2, status: "beta" };
+	var version = { major: 0, minor: 3, patch: 3, status: "beta" };
 
 
 
@@ -1735,23 +1735,29 @@
 			return;
 		for(var i = 0; i < this.rules[indicator].length; i++) {
 			var clause = this.rules[indicator][i];
-			var index = clause.head.args.length > 0 ? clause.head.args[0].index : undefined;
-			if(index) {
-				if(!this.indexed_clauses.hasOwnProperty(indicator))
-					this.indexed_clauses[indicator] = {};
-				if(!this.indexed_clauses[indicator].hasOwnProperty(index)) {
-					this.indexed_clauses[indicator][index] = [];
-					for(var j = 0; j < this.non_indexable_clauses.length; j++)
-						this.indexed_clauses[indicator][index].push(this.non_indexable_clauses[j]);
-				}
-				this.indexed_clauses[indicator][index].push(clause);
-			} else {
-				if(!this.non_indexable_clauses.hasOwnProperty(indicator))
-					this.non_indexable_clauses[indicator] = [];
-				this.non_indexable_clauses[indicator].push(clause);
-				for(var index in this.indexed_clauses[indicator])
-					this.indexed_clauses[indicator][index].push(clause);
+			this.add_index_predicate(clause);
+		}
+	};
+
+	// Add indexed cluuse to a predicate
+	Module.prototype.add_index_predicate = function(clause) {
+		var indicator = clause.head.indicator;
+		var index = clause.head.args.length > 0 ? clause.head.args[0].index : undefined;
+		if(index) {
+			if(!this.indexed_clauses.hasOwnProperty(indicator))
+				this.indexed_clauses[indicator] = {};
+			if(!this.indexed_clauses[indicator].hasOwnProperty(index)) {
+				this.indexed_clauses[indicator][index] = [];
+				for(var j = 0; j < this.non_indexable_clauses.length; j++)
+					this.indexed_clauses[indicator][index].push(this.non_indexable_clauses[j]);
 			}
+			this.indexed_clauses[indicator][index].push(clause);
+		} else {
+			if(!this.non_indexable_clauses.hasOwnProperty(indicator))
+				this.non_indexable_clauses[indicator] = [];
+			this.non_indexable_clauses[indicator].push(clause);
+			for(var index in this.indexed_clauses[indicator])
+				this.indexed_clauses[indicator][index].push(clause);
 		}
 	};
 
@@ -2525,7 +2531,7 @@
 		if(!get_module.public_predicates.hasOwnProperty(rule.head.indicator))
 			get_module.public_predicates[rule.head.indicator] = false;
 		// update term indexing
-		get_module.update_indices_predicate(rule.head.indicator);
+		get_module.add_index_predicate(rule);
 		return true;
 	};
 
@@ -4857,9 +4863,9 @@
 			if( pl.type.is_error( answer ) ) {
 				return "uncaught exception: " + answer.args[0].toString(options);
 			} else if( answer === false ) {
-				return "false.";
+				return "false";
 			} else if( answer === null ) {
-				return "limit exceeded ;";
+				return "limit exceeded";
 			} else {
 				var i = 0;
 				var str = "";
@@ -4900,11 +4906,10 @@
 							answer.links[link].toString( options, {priority: "700", class: "xfx", indicator: "=/2"}, "right" );
 					}
 				}
-				var delimiter = typeof thread === "undefined" || thread.points.length > 0 ? " ;" : "."; 
 				if( i === 0 ) {
-					return "true" + delimiter;
+					return "true";
 				} else {
-					return str + delimiter;
+					return str;
 				}
 			}
 		},
@@ -5050,7 +5055,7 @@
 
 		// '$findall'/4
 		"$findall/4": [
-			new pl.type.Rule(new pl.type.Term("$findall", [new pl.type.Var("Template0"),new pl.type.Var("Goal0"),new pl.type.Var("Instances"),new pl.type.Var("Tail")]), new pl.type.Term(";", [new pl.type.Term(",", [new pl.type.Term("copy_term", [new pl.type.Term("-", [new pl.type.Var("Template0"),new pl.type.Var("Goal0")]),new pl.type.Term("-", [new pl.type.Var("Template1"),new pl.type.Var("Goal1")])]),new pl.type.Term(",", [new pl.type.Term("call", [new pl.type.Var("Goal1")]),new pl.type.Term(",", [new pl.type.Term("$push_global_stack", [new pl.type.Var("Var"),new pl.type.Var("Template1")]),new pl.type.Term("false", [])])])]),new pl.type.Term("$flush_global_stack", [new pl.type.Var("Var"),new pl.type.Var("Instances"),new pl.type.Var("Tail")])]))
+			new pl.type.Rule(new pl.type.Term("$findall", [new pl.type.Var("Template0"),new pl.type.Var("Goal0"),new pl.type.Var("Instances"),new pl.type.Var("Tail")]), new pl.type.Term(";", [new pl.type.Term(",", [new pl.type.Term("copy_term", [new pl.type.Term("-", [new pl.type.Var("Template0"),new pl.type.Var("Goal0")]),new pl.type.Term("-", [new pl.type.Var("Template1"),new pl.type.Var("Goal1")])]),new pl.type.Term(",", [new pl.type.Term("call", [new pl.type.Var("Goal1")]),new pl.type.Term(",", [new pl.type.Term("copy_term", [new pl.type.Var("Template1"),new pl.type.Var("Template2")]),new pl.type.Term(",", [new pl.type.Term("$push_global_stack", [new pl.type.Var("Var"),new pl.type.Var("Template2")]),new pl.type.Term("false", [])])])])]),new pl.type.Term("$flush_global_stack", [new pl.type.Var("Var"),new pl.type.Var("Instances"),new pl.type.Var("Tail")])]))
 		],
 
 		// '$bagof'/3
@@ -8816,7 +8821,7 @@
 		// license/0
 		"license/0": function( thread, point, atom ) {
 			var msg = "Tau Prolog. A Prolog interpreter in JavaScript.\n";
-			msg += "Copyright (C) 2017 - 2020 José Antonio Riaza Valverde\n\n";
+			msg += "Copyright (C) 2017 - 2022 José Antonio Riaza Valverde\n\n";
 			msg += "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n";
 			msg += "1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.\n";
 			msg += "2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.\n";
