@@ -1,14 +1,15 @@
 {
 	"name": "tau-prolog",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"description": "An open source Prolog interpreter in JavaScript",
 	"main": "./modules/core.js",
+	"types": "./index.d.ts",
 	"scripts": {
 		"taupl": "node taupl.js"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/tau-prolog/tau-prolog.git"
+		"url": "git+https://github.com/guregu/tau-prolog.git"
 	},
 	"keywords": [
 		"tau-prolog",
